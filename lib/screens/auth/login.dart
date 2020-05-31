@@ -166,7 +166,7 @@ class LoginScreenState extends State<LoginScreen> {
                                   if(senha.isEmpty){
                                     return "Informe a senha.";
                                   }
-                                  if(senha.length < 6){
+                                  if(senha.length <= 6){
                                     return "A senha deve conter mais de 6 caracteres.";
                                   }
                                   return null;
@@ -228,7 +228,7 @@ class LoginScreenState extends State<LoginScreen> {
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: <Widget> [
-                                Text("Login", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),),
+                                Text("Login", style: TextStyle(color: Colors.white,fontSize: 20, fontWeight: FontWeight.bold),),
                               ],
                             ),
                             onPressed: (){

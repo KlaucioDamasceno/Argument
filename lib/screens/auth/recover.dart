@@ -37,7 +37,7 @@ class RecoverScreenState extends State<RecoverScreen> {
         showInfo("Senha enviada com sucesso!");
         Navigator.of(context).pop();
       }).catchError((error) {
-        print("Errooooooo!!!!!");
+        //print("Errooooooo!!!!!");
         showError("Erro ao fazer login");
       });
     }
@@ -128,9 +128,10 @@ class RecoverScreenState extends State<RecoverScreen> {
               height: 60,
             ),
             Container(
-              height: 60,
+              height: 50,
               alignment: Alignment.centerLeft,
               decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(10),
                 gradient: LinearGradient(
                   colors: [
                     Color.fromRGBO(143, 148, 251, 1),
