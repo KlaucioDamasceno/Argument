@@ -1,16 +1,37 @@
 class Usuario {
-  final String uid;
+  static const String TABLE_NAME = "usuario";
+  final int uid;
   final String nome;
   final String email;
+  final String senha;
   final bool admin;
 
-  Usuario({this.uid, this.nome, this.email, this.admin = true});
+  Usuario({this.uid, this.nome, this.email,this.senha, this.admin = true});
 
   Map<String, Object> toJson() {
-    return {"uid": this.uid, "nome": this.nome, "email": this.email, "admin": this.admin};
+    return {"uid": this.uid, "nome": this.nome, "email": this.email,"senha": this.senha, "admin": this.admin};
   }
 
   static fromJson(Map<String, Object> json) {
     return Usuario(uid: json["uid"], nome: json["nome"], email: json["email"], admin: json["admin"] ?? false);
+  }
+  Map<String, dynamic> toMap(){
+    return {
+      'uid' : uid,
+      'nome' : nome,
+      'email' : email,
+      'senha' : senha,
+      'admin' : admin,
+    };
+  } 
+
+  copyWith({int id}){
+    return Usuario(
+      uid: uid,
+      nome: this.nome,
+      email: this.email,
+      senha: this.senha,
+      admin: this.admin,
+    );
   }
 }

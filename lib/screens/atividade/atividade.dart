@@ -56,8 +56,8 @@ class AtividadeScreenState extends State<AtividadeScreen> {
           titulo: this._titulo,
           texto: this._texto,
           dataHoraInicio: this._dataHoraInicio,
-          usuario: this._usuarioService.usuarioStore.usuario.uid);
-
+          usuario: (this._usuarioService.usuarioStore.usuario.uid).toString());
+      
       this._atividadeService.salvar(_atividade).then((value) {
         showInfo("Debate Criado");
         Navigator.of(context).pop();

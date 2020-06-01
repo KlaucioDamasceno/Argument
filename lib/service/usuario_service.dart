@@ -1,12 +1,13 @@
 import 'dart:async';
 import 'dart:convert';
-
 import 'package:argument/domain/usuario.dart';
 import 'package:argument/stores/usuario_store.dart';
 import 'package:argument\/utils/navigator_utils.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+
 class UsuarioService {
+  //final DBhelper dbhelper;
   final UsuarioStore usuarioStore;
   StreamSubscription<StatusLogin> _statusLoginSubscription;
   SharedPreferences _preferences;
@@ -25,7 +26,7 @@ class UsuarioService {
   }
 
   Future<Usuario> entrarComEmailSenha(String email, String senha) async {
-    Usuario usuarioLogado = Usuario(nome: "Diego Ferreira", email: email);
+    Usuario usuarioLogado = Usuario(nome: "TCC", email: email);
     _preferences.setString("usuario_logado", jsonEncode(usuarioLogado.toJson()));
     usuarioStore.setUsuario(usuarioLogado);
     usuarioStore.setStatusLogin(StatusLogin.logado);
@@ -38,7 +39,8 @@ class UsuarioService {
     });
   }
 
-  Future<Usuario> criarUsuario(String nome, String email, String senha) {
+  Future<Usuario> criarUsuario(String nome, String email, String senha) async{
+    //final Database db = await dbhelper.getDatabase();
     return Future.value(Usuario(nome: nome, email: email));
   }
 
