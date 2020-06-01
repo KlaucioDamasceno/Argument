@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "956889960493",
+    "firebase_url": "https://argument-476ec.firebaseio.com",
+    "project_id": "argument-476ec",
+    "storage_bucket": "argument-476ec.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:956889960493:android:415cebbe2fc74babb068a4",
+        "android_client_info": {
+          "package_name": "br.com.argument"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "956889960493-kum5jmll9noobotjevg18jhufslc27q5.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCAZg4P7X5AC7Xzw-EvewUyV2FHsvfk2zQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "956889960493-kum5jmll9noobotjevg18jhufslc27q5.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
