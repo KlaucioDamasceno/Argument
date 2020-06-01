@@ -29,7 +29,7 @@ class LoginScreenState extends State<LoginScreen> {
       _formKey.currentState.save();
 
       try {
-        _usuarioService.entrarComEmailSenha(_email, _senha).then((usuario) {
+        _usuarioService.signIn(_email, _senha).then((usuario) {
           if (usuario == null) {
             showError("Usuário não cadastrado");
           }

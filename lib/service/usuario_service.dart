@@ -3,11 +3,14 @@ import 'dart:convert';
 import 'package:argument/domain/usuario.dart';
 import 'package:argument/stores/usuario_store.dart';
 import 'package:argument\/utils/navigator_utils.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 
 class UsuarioService {
   //final DBhelper dbhelper;
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+  FirebaseUser _user;
   final UsuarioStore usuarioStore;
   StreamSubscription<StatusLogin> _statusLoginSubscription;
   SharedPreferences _preferences;
@@ -24,9 +27,8 @@ class UsuarioService {
       _preferences = value;
     });
   }
-
   Future<Usuario> entrarComEmailSenha(String email, String senha) async {
-    Usuario usuarioLogado = Usuario(nome: "TCC", email: email);
+    Usuario usuarioLogado = Usuario( email: email);
     _preferences.setString("usuario_logado", jsonEncode(usuarioLogado.toJson()));
     usuarioStore.setUsuario(usuarioLogado);
     usuarioStore.setStatusLogin(StatusLogin.logado);
@@ -68,4 +70,5 @@ class UsuarioService {
   void dispose() {
     _statusLoginSubscription.cancel();
   }
+  
 }
