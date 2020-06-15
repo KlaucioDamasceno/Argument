@@ -11,6 +11,8 @@ import 'package:argument/service/usuario_service.dart';
 import 'package:argument/stores/atividade_store.dart';
 import 'package:argument/stores/usuario_store.dart';
 import 'package:argument/utils/navigator_utils.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -25,17 +27,19 @@ class MyApp extends StatelessWidget {
       child: MultiProvider(
         providers: [
           Provider<UsuarioService>(
-            create: (_) => UsuarioService(UsuarioStore()),
+            create: (_) => UsuarioService(UsuarioStore(),FirebaseAuth.instance, Firestore.instance),
             dispose: (ctx, usuarioService) {
               usuarioService.dispose();
             },
           ),
           Provider<AtividadeService>(
-            create: (_) => AtividadeService(AtividadeStore()),
+            create: (_){
+              return AtividadeService(AtividadeStore(),Firestore.instance);
+            },
             dispose: (ctx, atividadeService) {
               atividadeService.dispose();
-            },
-          )
+            }
+          ),
         ],
         child: MaterialApp(
           title: 'Argument',
@@ -43,9 +47,9 @@ class MyApp extends StatelessWidget {
           navigatorObservers: [BotToastNavigatorObserver()],
           navigatorKey: NavigatorUtils.nav,
           theme: ThemeData(
-              primarySwatch: Colors.blue,
-              buttonTheme: ButtonThemeData(buttonColor: Colors.blue[700], textTheme: ButtonTextTheme.primary, height: 50)),
-          initialRoute: "login",
+              primarySwatch: Colors.purple,
+              buttonTheme: ButtonThemeData(buttonColor: Colors.purple[300],textTheme: ButtonTextTheme.primary, height: 50)),
+          initialRoute: "splash",
           routes: {
             "splash": (context) => Splash(),
             "login": (context) => LoginScreen(),

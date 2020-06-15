@@ -1,6 +1,6 @@
 class Usuario {
   static const String TABLE_NAME = "usuario";
-  final int uid;
+  final String uid;
   final String nome;
   final String email;
   final String senha;
@@ -24,14 +24,4 @@ class Usuario {
       'admin' : admin,
     };
   } 
-
-  copyWith({int id}){
-    return Usuario(
-      uid: uid,
-      nome: this.nome,
-      email: this.email,
-      senha: this.senha,
-      admin: this.admin,
-    );
-  }
 }

@@ -1,5 +1,9 @@
+import 'dart:async';
+
+import 'package:argument/domain/atividade.dart';
 import 'package:argument/service/atividade_service.dart';
 import 'package:argument/service/usuario_service.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
@@ -15,6 +19,8 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   AtividadeService _atividadeService;
   UsuarioService _usuarioService;
+  List<Atividade>items;
+
 
   @override
   void initState() {
@@ -25,6 +31,7 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     _usuarioService = Provider.of<UsuarioService>(context);
     _atividadeService = Provider.of<AtividadeService>(context);
+
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Color.fromRGBO(143, 148, 251, 1),
@@ -158,73 +165,118 @@ class _HomeScreenState extends State<HomeScreen> {
       builder: (ctx) {
         if (_atividadeService.atividadeStore.atividades.isEmpty) {
           return Center(
-            child: Text("Sem Debates para exibir"),
+            child: Text("Sem atividades para exibir"),
           );
         }
         return ListView(
           children: _atividadeService.atividadeStore.atividades.map((atividade) {
             return Card(
+                elevation: 15,
                 child: InkWell(
-              child: Container(
-                height: 370,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: <Widget>[
-//                      Container(width: double.maxFinite, height: 150, child: Image.network(ativade.foto, fit: BoxFit.cover)),
-                    SizedBox(
-                      height: 10,
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 3, horizontal: 5),
-                      child: Text(atividade.tema, style: TextStyle(color: Colors.black54, fontWeight: FontWeight.bold)),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 3, horizontal: 5),
-                      child: Text(atividade.titulo, style: TextStyle(color: Colors.black54), overflow: TextOverflow.ellipsis, maxLines: 4),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 3, horizontal: 5),
-                      child: Text(atividade.texto, style: TextStyle(color: Colors.black54), overflow: TextOverflow.ellipsis, maxLines: 4),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 3, horizontal: 5),
-                      child: Text("Início: ${DateFormat("dd/MM/yyyy HH:mm").format(atividade.dataHoraInicio)}",
-                          style: TextStyle(color: Colors.black54, fontWeight: FontWeight.bold)),
-                    ),
-                    Expanded(
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        crossAxisAlignment: CrossAxisAlignment.end,
-                        children: <Widget>[
-                          Observer(
-                            builder: (ctx) {
-                              if (_usuarioService.usuarioStore.usuario.admin) {
-                                return InkWell(
-                                  onTap: () {},
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(20),
-                                    child: Text("Editar"),
-                                  ),
-                                );
-                              } else {
-                                return SizedBox.shrink();
-                              }
-                            },
+                  child: Container(
+                    height: 150,
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Container(
+                          height: 200.0,
+                          width: 150.0,
+                          decoration: BoxDecoration(
+                              borderRadius: BorderRadius.only(
+                                  bottomLeft: Radius.circular(5),
+                                  topLeft: Radius.circular(5)
+                              ),
+                              image: DecorationImage(
+                                  fit: BoxFit.cover,
+                                  image: NetworkImage("https://image.freepik.com/vetores-gratis/ilustracao-de-debates-politicos_9041-74.jpg"))
                           ),
-                          InkWell(
-                            onTap: () {},
-                            child: Padding(
-                              padding: const EdgeInsets.all(20),
-                              child: Text("Avise-me"),
+                        ),
+                        Container(
+                          height: 200,
+                          child: Padding(
+                            padding: EdgeInsets.fromLTRB(10, 2, 0, 0),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(""),
+                                Padding(
+                                  padding: EdgeInsets.fromLTRB(0, 5, 0, 2),
+                                  child: Container(
+                                    width: 260,
+                                    child: Text('Tema: '+atividade.tema,style: TextStyle(
+                                        fontSize: 15,
+                                        color: Color.fromARGB(255, 48, 48, 54)
+                                    ),),
+                                  ),
+                                ),
+                                Padding(
+                                  padding: EdgeInsets.fromLTRB(0, 5, 0, 2),
+                                  child: Container(
+                                    width: 260,
+                                    child: Text('Título: '+atividade.titulo,style: TextStyle(
+                                        fontSize: 15,
+                                        color: Color.fromARGB(255, 48, 48, 54)
+                                    ),),
+                                  ),
+                                ),
+                                Padding(
+                                  padding: EdgeInsets.fromLTRB(0, 5, 0, 2),
+                                  child: Container(
+                                    width: 260,
+                                    child: Text('Texto: '+atividade.texto,style: TextStyle(
+                                        fontSize: 15,
+                                        color: Color.fromARGB(255, 48, 48, 54)
+                                    ),),
+                                  ),
+                                ),
+
+                                Padding(
+                                  padding: EdgeInsets.fromLTRB(0, 5, 0, 2),
+                                  child: Container(
+                                    width: 260,
+                                    child: Text("Início: ${DateFormat("dd/MM/yyyy").format(atividade.dataHoraInicio)}",
+                                      style: TextStyle(color: Colors.black54, fontWeight: FontWeight.bold),
+                                    ),
+                                  ),
+                                ),
+                                Expanded(
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.end,
+                                    crossAxisAlignment: CrossAxisAlignment.end,
+                                    children: [
+                                      Observer(
+                                        builder: (ctx) {
+                                          if (_usuarioService.usuarioStore.usuario.admin) {
+                                            return InkWell(
+                                              onTap: () {},
+                                              child: Padding(
+                                                padding: const EdgeInsets.all(20),
+                                                // child: Text("Editar"),
+                                              ),
+                                            );
+                                          } else {
+                                            return SizedBox.shrink();
+                                          }
+                                        },
+                                      ),
+                                      InkWell(
+                                        onTap: () {},
+                                        child: Padding(
+                                          padding: const EdgeInsets.all(20),
+                                          //child: Text("Avise-me"),
+                                        ),
+                                      )
+                                    ],
+                                  ),
+                                ),
+                              ],
                             ),
-                          )
-                        ],
-                      ),
-                    )
-                  ],
-                ),
-              ),
-            ));
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ));
           }).toList(),
         );
       },

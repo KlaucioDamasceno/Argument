@@ -58,7 +58,7 @@ class AtividadeScreenState extends State<AtividadeScreen> {
           dataHoraInicio: this._dataHoraInicio,
           usuario: (this._usuarioService.usuarioStore.usuario.uid).toString());
       
-      this._atividadeService.salvar(_atividade).then((value) {
+      this._atividadeService.criarDebate(_atividade).then((value) {
         showInfo("Debate Criado");
         Navigator.of(context).pop();
       });
