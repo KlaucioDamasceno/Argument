@@ -1,62 +1,97 @@
 import 'dart:async';
+
+import 'package:argument/db/DBhelper.dart';
 import 'package:argument/domain/atividade.dart';
-import 'package:argument/screens/atividade/atividade.dart';
 import 'package:argument/stores/atividade_store.dart';
+import 'package:argument/stores/hud_store.dart';
+import 'package:argument/stores/usuario_store.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-
 class AtividadeService {
-
   final AtividadeStore atividadeStore;
+  final DbHelper dbHelper;
   final Firestore _firestore;
-  List<Atividade> atividades;
+  final HudStore _hudStore;
+  final UsuarioStore _usuarioStore;
+  StreamSubscription _atividadesStream;
 
-  AtividadeService(this.atividadeStore, this._firestore );
-
-  Future<List<Atividade>> buscarAtividades() async{
-    Atividade atividade = Atividade();
-    _firestore.collection('tarefas').getDocuments().then((snapshots){
-      for(var tarefa in snapshots.documents){
-        atividade = Atividade.fromMap(tarefa.data, tarefa.documentID);
-        atividadeStore.adicionarAtividade(atividade);
-      }
+  AtividadeService(this.atividadeStore, this.dbHelper, this._firestore,
+      this._hudStore, this._usuarioStore) {
+    this._atividadesStream = atividadesStream().listen((atividades) {
+      atividadeStore.setAtividades(atividades);
     });
-    return Future.value(atividadeStore.atividades);
-  }
-  Future<List<Atividade>> carregarAtividades() async{
-    List<Atividade> atividades = List<Atividade>();
-    Atividade atividade = Atividade();
-    return await _firestore.collection('tarefas')
-    .getDocuments()
-    // ignore: missing_return
-    .then((snapshot){
-    for(var tarefa in snapshot.documents){
-      atividades.add(Atividade.fromMap(tarefa.data, tarefa.documentID));
-      atividade = Atividade.fromMap(tarefa.data, tarefa.documentID);
-      atividadeStore.adicionarAtividade(atividade);
-      }
-    //atividadeStore.setAtividades(atividades);
-    });
-    // ignore: dead_code
-    return atividades;
-  }
-  
-
-  Future<void> salvar(Atividade atividade){
-    atividadeStore.adicionarAtividade(atividade);
-  }
-  
-  Future<void> criarDebate(Atividade atividade) async {
-    await _firestore
-        .collection("tarefas")
-        .document()
-        .setData(atividade.toMap());
-    atividadeStore.adicionarAtividade(atividade);
   }
 
+  Future<List<Atividade>> carregarAtividades(String ptema) async {
+//    return dbHelper.getDatabase().then((db) {
+//      return db.query(Atividade.TABLE_NAME)
+//          .then((atividadesMap) => atividadesMap.map((map) => Atividade.fromMap(map)).toList())
+//          .then((atividades) {
+//            atividadeStore.setAtividades(atividades);
+//            return atividades;
+//      });
+//    });
 
-  void dispose(){
+    return _firestore
+        .collection('tarefas')
+        .where("tema", isEqualTo: ptema)
+        .getDocuments()
+        .then((qsnp) => qsnp.documents
+            .map((document) => Atividade.fromMap(document.data))
+            .toList());
   }
 
+  Future<List<Atividade>> loadAtividades(String ptema) async {
+//    return dbHelper.getDatabase().then((db) {
+//      return db.query(Atividade.TABLE_NAME)
+//          .then((atividadesMap) => atividadesMap.map((map) => Atividade.fromMap(map)).toList())
+//          .then((atividades) {
+//            atividadeStore.setAtividades(atividades);
+//            return atividades;
+//      });
+//    });
 
+    return _firestore
+        .collection('tarefas')
+        .where("tema", isEqualTo: ptema)
+        .getDocuments()
+        .then((qsnp) => qsnp.documents
+            .map((document) => Atividade.fromMap(document.data))
+            .toList());
+  }
+
+  Stream<List<Atividade>> atividadesStream() {
+    return _firestore
+        .collection('tarefas')
+        .where("usuario", isEqualTo: _usuarioStore.usuario.uid)
+        .snapshots()
+        .map((qsnp) => qsnp.documents
+            .map((document) => Atividade.fromMap(document.data))
+            .toList());
+  }
+
+  Future<Atividade> salvar(Atividade atividade) async {
+//    final Database db = await dbHelper.getDatabase();
+
+//    int idAtividade = await db.insert(
+//      Atividade.TABLE_NAME,
+//      atividade.toMap(),
+//      conflictAlgorithm: ConflictAlgorithm.replace,
+//    );
+
+    _hudStore.show("Adicionando debate...");
+    DocumentReference atividadeRef =
+        _firestore.collection(Atividade.TABLE_NAME).document();
+    Atividade novaAtividade = atividade.copyWith(id: atividadeRef.documentID);
+    atividadeStore.adicionarAtividade(novaAtividade);
+
+    return atividadeRef
+        .setData(novaAtividade.toMap())
+        .then((_) => novaAtividade)
+        .whenComplete(() => _hudStore.hide());
+  }
+
+  void dispose() {
+    this._atividadesStream.cancel();
+  }
 }

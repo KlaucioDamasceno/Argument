@@ -1,20 +1,23 @@
 import 'dart:async';
 import 'package:argument/domain/usuario.dart';
+import 'package:argument/stores/hud_store.dart';
 import 'package:argument/stores/usuario_store.dart';
 import 'package:argument/utils/message_utils.dart';
 import 'package:argument\/utils/navigator_utils.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
-
-
 class UsuarioService {
   final UsuarioStore usuarioStore;
   final FirebaseAuth _auth;
   final Firestore _firestore;
-  StreamSubscription _authSubscription;
+  final HudStore _hudStore;
 
-  UsuarioService(this.usuarioStore, this._auth, this._firestore) {
+  StreamSubscription _authSubscription;
+  StreamSubscription _userDataSubscription;
+
+  UsuarioService(
+      this.usuarioStore, this._auth, this._firestore, this._hudStore) {
     escutarStatusLogin();
   }
 
@@ -27,6 +30,7 @@ class UsuarioService {
         usuarioStore.setStatusLogin(StatusLogin.logado);
         obterUsuarioPorEmail(userData.email).then((fuser) {
           usuarioStore.setUsuario(fuser);
+          escutarDadosUsuario(fuser);
           NavigatorUtils.nav.currentState.pushReplacementNamed("home");
         }).catchError((error) {
           showError("Erro ao recuperar dados do usuario");
@@ -36,22 +40,65 @@ class UsuarioService {
     });
   }
 
+  escutarDadosUsuario(Usuario usuario) {
+    _userDataSubscription = usuarioStream(usuario).listen((newUser) {
+      usuarioStore.setUsuario(newUser);
+    });
+  }
+
+  Stream<Usuario> usuarioStream(Usuario usuario) {
+    return _firestore
+        .document("usuarios/${usuario.uid}")
+        .snapshots()
+        .map((event) => Usuario.fromJson(event.data));
+  }
+
   Future<AuthResult> entrarComEmailSenha(String email, String senha) async {
-    return _auth.signInWithEmailAndPassword(email: email, password: senha);
+    _hudStore.show("Entrando...");
+    return _auth
+        .signInWithEmailAndPassword(email: email, password: senha)
+        .whenComplete(() => _hudStore.hide());
   }
 
   Future<void> recuperarSenha(String email) async {
-    return _auth.sendPasswordResetEmail(email: email);
+    _hudStore.show("Enviando...");
+    return _auth
+        .sendPasswordResetEmail(email: email)
+        .whenComplete(() => _hudStore.hide());
   }
 
+  //Future<void> enviarFoto(String uid, File foto) {
+  //  if (foto.existsSync()) {
+  //    StorageReference storageReference = FirebaseStorage()
+  //        .ref()
+  //        .child("profile_pics/$uid/${basename(foto.path)}");
+  //    storageReference.putFile(
+  //        foto, StorageMetadata(customMetadata: {"uid": uid}));
+  //  }
+  //}
+
   Future<void> criarUsuario(String nome, String email, String senha) {
+    //File file) {
+    _hudStore.show("Cadastrando...");
     _authSubscription?.cancel();
-    return _auth.createUserWithEmailAndPassword(email: email, password: senha).then((authResult) async {
+
+    return _auth
+        .createUserWithEmailAndPassword(email: email, password: senha)
+        .then((authResult) async {
+      //enviarFoto(authResult.user.uid, file);
       await _firestore
           .collection("usuarios")
           .document(authResult.user.uid)
-          .setData(Usuario(uid: authResult.user.uid, email: email, admin: false, nome: nome).toJson());
-    }).whenComplete(() => escutarStatusLogin());
+          .setData(Usuario(
+                  uid: authResult.user.uid,
+                  email: email,
+                  admin: true,
+                  nome: nome)
+              .toJson());
+    }).whenComplete(() {
+      escutarStatusLogin();
+      _hudStore.hide();
+    });
   }
 
   Future<Usuario> obterUsuarioPorEmail(String email) {
@@ -68,5 +115,6 @@ class UsuarioService {
 
   void dispose() {
     _authSubscription?.cancel();
+    _userDataSubscription?.cancel();
   }
 }
