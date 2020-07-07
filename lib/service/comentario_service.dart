@@ -53,11 +53,11 @@ class ComentarioService {
 //      atividade.toMap(),
 //      conflictAlgorithm: ConflictAlgorithm.replace,
 //    );
-
+    
     DocumentReference comentarioRef =
         _firestore.collection('comentarios').document();
     Comentario novoComentario =
-        comentario.copyWith(id: comentarioRef.documentID);
+        comentario.copyWith(uid: comentarioRef.documentID);
     comentarioStore.adicionarComentario(novoComentario);
 
     return comentarioRef

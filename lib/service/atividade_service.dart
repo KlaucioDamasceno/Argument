@@ -82,7 +82,7 @@ class AtividadeService {
     _hudStore.show("Adicionando debate...");
     DocumentReference atividadeRef =
         _firestore.collection(Atividade.TABLE_NAME).document();
-    Atividade novaAtividade = atividade.copyWith(id: atividadeRef.documentID);
+    Atividade novaAtividade = atividade.copyWith(uid: atividadeRef.documentID);
     atividadeStore.adicionarAtividade(novaAtividade);
 
     return atividadeRef

@@ -75,14 +75,17 @@ class _BodyDetailsState extends State<BodyDetails> {
                 ),
                 Padding(
                   padding: EdgeInsets.symmetric(vertical: kDefaultPadding / 2),
-                  child: Text(
-                    "${widget.atividade.texto}",
-                    style: TextStyle(color: kTextLightColor),
+                  child: SelectableText.rich(
+                    TextSpan(
+                      text: "${widget.atividade.texto}",
+                      style: TextStyle(color: kTextLightColor),
+                    ),
                   ),
                 ),
                 SizedBox(
                   height: kDefaultPadding,
                 ),
+                q
               ],
             ),
           ),
@@ -125,14 +128,14 @@ class _BodyDetailsState extends State<BodyDetails> {
     DocumentReference comentarioRef =
         Firestore.instance.collection('comentarios').document();
     Comentario novoComentario =
-        comentario.copyWith(id: comentarioRef.documentID);
+        comentario.copyWith(uid: comentarioRef.documentID);
     comentarioRef.setData(novoComentario.toMap()).then((_) => novoComentario);
   }
 
   Comentario comentario(
       Comentario _comentario, List<DocumentSnapshot> documents, int index) {
     return _comentario = Comentario(
-      id: documents[index].data['id'],
+      uid: documents[index].data['uid'],
       comment: documents[index].data['comment'],
       debate: documents[index].data['debate'],
       username: documents[index].data['username'],

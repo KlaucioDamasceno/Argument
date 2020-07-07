@@ -64,7 +64,7 @@ class Atividade {
             : null);
   }
 
-  Atividade copyWith({String id}) {
+  Atividade copyWith({String uid}) {
     return Atividade(
         uid: uid,
         tema: this.tema,
