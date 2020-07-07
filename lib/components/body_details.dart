@@ -85,7 +85,6 @@ class _BodyDetailsState extends State<BodyDetails> {
                 SizedBox(
                   height: kDefaultPadding,
                 ),
-                q
               ],
             ),
           ),
