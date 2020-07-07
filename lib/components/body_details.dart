@@ -117,12 +117,13 @@ class _BodyDetailsState extends State<BodyDetails> {
     );
   }
 
-  void _sendComment(String text) {
+  void _sendComment(String text, String posicao) {
     Comentario comentario = Comentario(
       comment: text,
       username: this._usuarioService.usuarioStore.usuario.nome,
       debate: widget.atividade.uid,
-      //time: DateTime.now()
+      posicao: posicao,
+      time: DateTime.now(),
     );
     DocumentReference comentarioRef =
         Firestore.instance.collection('comentarios').document();
@@ -133,12 +134,7 @@ class _BodyDetailsState extends State<BodyDetails> {
 
   Comentario comentario(
       Comentario _comentario, List<DocumentSnapshot> documents, int index) {
-    return _comentario = Comentario(
-      uid: documents[index].data['uid'],
-      comment: documents[index].data['comment'],
-      debate: documents[index].data['debate'],
-      username: documents[index].data['username'],
-    );
+    return _comentario = Comentario.fromMap(documents[index].data);
   }
 
   _listarAtividadesStream() {
@@ -147,7 +143,7 @@ class _BodyDetailsState extends State<BodyDetails> {
           .collection('comentarios')
           .where('debate', isEqualTo: widget.atividade.uid)
           .snapshots()
-          .map((qsnp) => qsnp.documents.reversed
+          .map((qsnp) => qsnp.documents
               .map((document) => Comentario.fromMap(document.data))
               .toList()),
       builder: (context, AsyncSnapshot<List<Comentario>> snp) {
@@ -159,7 +155,7 @@ class _BodyDetailsState extends State<BodyDetails> {
 
         if (snp.hasError) {
           return Center(
-            child: Text("Erro ao carregar atividades..."),
+            child: Text("Erro ao carregar comentários..."),
           );
         }
 

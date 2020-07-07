@@ -5,10 +5,18 @@ class Comentario {
   final String comment;
   final String debate;
   final String username;
+  final String posicao;
+  final DateTime time;
 
   //final String foto;
 
-  Comentario({this.uid, this.comment, this.debate, this.username});
+  Comentario(
+      {this.uid,
+      this.comment,
+      this.debate,
+      this.username,
+      this.posicao,
+      this.time});
 
   Map<String, dynamic> toMap() {
     return {
@@ -16,7 +24,9 @@ class Comentario {
       'comment': comment,
       'debate': debate,
       'username': username,
+      'posicao': posicao,
       //'foto': foto,
+      'time': time?.millisecondsSinceEpoch,
     };
   }
 
@@ -26,6 +36,10 @@ class Comentario {
       comment: map["comment"],
       debate: map["debate"],
       username: map["username"],
+      posicao: map["posicao"],
+      time: map["time"] != null
+          ? DateTime.fromMillisecondsSinceEpoch(map["time"])
+          : null,
     );
 
     //foto: map["foto"]);
@@ -37,6 +51,8 @@ class Comentario {
       comment: this.comment,
       debate: this.debate,
       username: this.username,
+      posicao: this.posicao,
+      time: this.time,
     );
   }
 }

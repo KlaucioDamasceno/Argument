@@ -1,5 +1,6 @@
 import 'package:argument/domain/comentario.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 class CommentsListKeyPrefix {
   static final String singleComment = "Comment";
@@ -15,6 +16,8 @@ class CommentsList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    Comparator<Comentario> priceComparator = (a, b) => a.time.compareTo(b.time);
+    comentarios.sort(priceComparator);
     return Padding(
       padding: const EdgeInsets.only(top: 8.0),
       child: ExpansionTile(
@@ -61,7 +64,8 @@ class _SingleComment extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
                 Text(
-                  comentario.username.toUpperCase(),
+                  comentario.username.toUpperCase() +
+                      " às ${DateFormat("dd/MM/yyyy HH:mm").format(comentario.time)}",
                   key: ValueKey("${CommentsListKeyPrefix.commentUser} $index"),
                   style: TextStyle(
                       fontSize: 16,
@@ -69,12 +73,24 @@ class _SingleComment extends StatelessWidget {
                       color: Colors.grey),
                   textAlign: TextAlign.left,
                 ),
-                Text(
-                  comentario.comment,
-                  key: ValueKey("${CommentsListKeyPrefix.commentText} $index"),
-                  style: TextStyle(fontSize: 13),
-                  textAlign: TextAlign.left,
-                ),
+                comentario.posicao == 'Concordo'
+                    ? Text(
+                        comentario.comment,
+                        key: ValueKey(
+                            "${CommentsListKeyPrefix.commentText} $index"),
+                        style: TextStyle(fontSize: 13, color: Colors.blue),
+                        textAlign: TextAlign.left,
+                      )
+                    : Container(),
+                comentario.posicao == 'Discordo'
+                    ? Text(
+                        comentario.comment,
+                        key: ValueKey(
+                            "${CommentsListKeyPrefix.commentText} $index"),
+                        style: TextStyle(fontSize: 13, color: Colors.red),
+                        textAlign: TextAlign.left,
+                      )
+                    : Container(),
                 Divider(),
               ],
             ),

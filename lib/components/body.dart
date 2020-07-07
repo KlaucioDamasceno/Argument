@@ -57,6 +57,9 @@ class Body extends StatelessWidget {
                         child: Text("Erro ao carregar debates..."),
                       );
                     }
+                    if (snapshot.data.documents.length == 0) {
+                      return Center(child: Text("Sem debates para exibir"));
+                    }
                     return ListView.builder(
                       itemCount: snapshot.data.documents.length,
                       itemBuilder: (context, index) => DebateCard(

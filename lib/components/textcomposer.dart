@@ -7,7 +7,7 @@ class TextComposer extends StatefulWidget {
     this.sendComment,
   }) : super(key: key);
 
-  final Function(String) sendComment;
+  final Function(String, String) sendComment;
 
   @override
   _TextComposerState createState() => _TextComposerState();
@@ -15,6 +15,7 @@ class TextComposer extends StatefulWidget {
 
 class _TextComposerState extends State<TextComposer> {
   bool _isComposing = false;
+  String _posicao;
   final TextEditingController _controller = TextEditingController();
 
   void _reset() {
@@ -30,9 +31,22 @@ class _TextComposerState extends State<TextComposer> {
       margin: const EdgeInsets.symmetric(horizontal: 8),
       child: Row(
         children: <Widget>[
+          IconButton(
+              icon: Icon(
+                Icons.add_comment,
+                color: Colors.blue,
+              ),
+              onPressed: _isComposing
+                  ? () {
+                      _posicao = "Concordo";
+                      widget.sendComment(_controller.text, _posicao);
+                      _reset();
+                    }
+                  : null),
           Expanded(
             child: TextField(
               controller: _controller,
+              textAlign: TextAlign.center,
               decoration: InputDecoration.collapsed(
                 hintText: 'Adicionar Comentário',
               ),
@@ -41,17 +55,17 @@ class _TextComposerState extends State<TextComposer> {
                   _isComposing = text.isNotEmpty;
                 });
               },
-              onSubmitted: (text) {
-                widget.sendComment(text);
-                _reset();
-              },
             ),
           ),
           IconButton(
-              icon: Icon(Icons.add_comment),
+              icon: Icon(
+                Icons.add_comment,
+                color: Colors.red,
+              ),
               onPressed: _isComposing
                   ? () {
-                      widget.sendComment(_controller.text);
+                      _posicao = "Discordo";
+                      widget.sendComment(_controller.text, _posicao);
                       _reset();
                     }
                   : null),
