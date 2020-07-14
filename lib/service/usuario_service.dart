@@ -1,11 +1,15 @@
 import 'dart:async';
+import 'dart:io';
 import 'package:argument/domain/usuario.dart';
 import 'package:argument/stores/hud_store.dart';
 import 'package:argument/stores/usuario_store.dart';
 import 'package:argument/utils/message_utils.dart';
 import 'package:argument\/utils/navigator_utils.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
+import 'package:path/path.dart';
 
 class UsuarioService {
   final UsuarioStore usuarioStore;
@@ -67,25 +71,15 @@ class UsuarioService {
         .whenComplete(() => _hudStore.hide());
   }
 
-  //Future<void> enviarFoto(String uid, File foto) {
-  //  if (foto.existsSync()) {
-  //    StorageReference storageReference = FirebaseStorage()
-  //        .ref()
-  //        .child("profile_pics/$uid/${basename(foto.path)}");
-  //    storageReference.putFile(
-  //        foto, StorageMetadata(customMetadata: {"uid": uid}));
-  //  }
-  //}
-
-  Future<void> criarUsuario(String nome, String email, String senha) {
-    //File file) {
+  Future<void> criarUsuario(
+      String nome, String email, String senha, File file) {
     _hudStore.show("Cadastrando...");
     _authSubscription?.cancel();
 
     return _auth
         .createUserWithEmailAndPassword(email: email, password: senha)
         .then((authResult) async {
-      //enviarFoto(authResult.user.uid, file);
+      enviarFoto(authResult.user.uid, file);
       await _firestore
           .collection("usuarios")
           .document(authResult.user.uid)
@@ -93,12 +87,34 @@ class UsuarioService {
                   uid: authResult.user.uid,
                   email: email,
                   admin: true,
-                  nome: nome)
+                  nome: nome,
+                  senha: senha)
               .toJson());
     }).whenComplete(() {
       escutarStatusLogin();
       _hudStore.hide();
     });
+  }
+
+  Future<void> alterarUsuario(Usuario usuario, {File file}) {
+    _hudStore.show("Alterando...");
+    DocumentReference dr = _firestore.document("usuarios/${usuario.uid}");
+    return dr.setData(usuario.toJson(), merge: true).whenComplete(() {
+      if (file != null) {
+        enviarFoto(usuario.uid, file);
+      }
+      _hudStore.hide();
+    });
+  }
+
+  Future<void> enviarFoto(String uid, File foto) {
+    if (foto.existsSync()) {
+      StorageReference storageReference = FirebaseStorage()
+          .ref()
+          .child("profile_pics/$uid/${basename(foto.path)}");
+      storageReference.putFile(
+          foto, StorageMetadata(customMetadata: {"uid": uid}));
+    }
   }
 
   Future<Usuario> obterUsuarioPorEmail(String email) {

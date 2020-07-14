@@ -1,15 +1,13 @@
-import 'dart:async';
 import 'package:argument/domain/atividade.dart';
-import 'package:argument/screens/atividade/atividade.dart';
+import 'package:argument/screens/auth/edit.dart';
 import 'package:argument/screens/debate/debate.dart';
 import 'package:argument/service/atividade_service.dart';
 import 'package:argument/service/usuario_service.dart';
 import 'package:argument/utils/constants.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
-import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -18,7 +16,6 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  AtividadeService _atividadeService;
   UsuarioService _usuarioService;
   List<Atividade> items;
 
@@ -30,7 +27,6 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     _usuarioService = Provider.of<UsuarioService>(context);
-    _atividadeService = Provider.of<AtividadeService>(context);
 
     return Scaffold(
       appBar: AppBar(
@@ -50,13 +46,34 @@ class _HomeScreenState extends State<HomeScreen> {
                 color: kPrimaryColor,
               ),
               child: Observer(
-                builder: (ctx) => Row(
-                  //crossAxisAlignment: CrossAxisAlignment.start,
+                builder: (ctx) => Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
-                    CircleAvatar(
-                      radius: 40,
-                      backgroundColor: Colors.white,
-                    ),
+                    this._usuarioService.usuarioStore.usuario.foto != null
+                        ? CachedNetworkImage(
+                            imageUrl:
+                                this._usuarioService.usuarioStore.usuario.foto,
+                            imageBuilder: (_, imageProvider) {
+                              return Container(
+                                width: 80,
+                                height: 80,
+                                decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(50),
+                                    image: DecorationImage(
+                                        image: imageProvider,
+                                        fit: BoxFit.fill)),
+                              );
+                            },
+                          )
+                        : Container(
+                            width: 60,
+                            height: 60,
+                            child: Icon(Icons.person, size: 40),
+                            decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius:
+                                    BorderRadius.all(Radius.circular(20))),
+                          ),
                     SizedBox(
                       width: 20,
                     ),
@@ -83,7 +100,9 @@ class _HomeScreenState extends State<HomeScreen> {
                 ],
               ),
               onTap: () {
-                //adicionar caminho para profile
+                Navigator.of(context).push(MaterialPageRoute(
+                    builder: (_) => EditProfileScreen(
+                        usuario: this._usuarioService.usuarioStore.usuario)));
               },
             ),
             ListTile(

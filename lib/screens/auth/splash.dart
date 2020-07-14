@@ -13,7 +13,7 @@ class _SplashState extends State<Splash> {
     UsuarioService usuarioService = Provider.of<UsuarioService>(context);
     return Scaffold(
       body: Center(
-        child: Text("Argument", style: TextStyle(fontSize: 20)),
+        child: Text('Argument'),
       ),
     );
   }

@@ -38,13 +38,13 @@ class CommentsList extends StatelessWidget {
 class _SingleComment extends StatelessWidget {
   final int index;
   final List<Comentario> comentarios;
-
   const _SingleComment({Key key, @required this.index, this.comentarios})
       : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     Comentario comentario = comentarios[index];
+    String mine = comentario.posicao;
     return Container(
       width: double.infinity,
       margin: const EdgeInsets.symmetric(vertical: 5.0),
@@ -52,16 +52,30 @@ class _SingleComment extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
-          Padding(
-            padding: const EdgeInsets.only(right: 16),
-            child: CircleAvatar(
-              child: Image.asset("assets/images/avatar.png"),
-            ),
-          ),
+          mine == 'Concordo'
+              ? Padding(
+                  padding: const EdgeInsets.only(right: 16),
+                  child: Container(
+                    width: 50.0,
+                    height: 50.0,
+                    decoration: new BoxDecoration(
+                      color: const Color(0xff7c94b6),
+                      image: new DecorationImage(
+                        image: new NetworkImage(comentario.foto),
+                        fit: BoxFit.cover,
+                      ),
+                      borderRadius:
+                          new BorderRadius.all(new Radius.circular(50.0)),
+                    ),
+                  ),
+                )
+              : Container(),
           Flexible(
             fit: FlexFit.loose,
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+              crossAxisAlignment: mine == 'Concordo'
+                  ? CrossAxisAlignment.start
+                  : CrossAxisAlignment.end,
               children: <Widget>[
                 Text(
                   comentario.username.toUpperCase() +
@@ -73,28 +87,37 @@ class _SingleComment extends StatelessWidget {
                       color: Colors.grey),
                   textAlign: TextAlign.left,
                 ),
-                comentario.posicao == 'Concordo'
-                    ? Text(
-                        comentario.comment,
-                        key: ValueKey(
-                            "${CommentsListKeyPrefix.commentText} $index"),
-                        style: TextStyle(fontSize: 13, color: Colors.blue),
-                        textAlign: TextAlign.left,
-                      )
-                    : Container(),
-                comentario.posicao == 'Discordo'
-                    ? Text(
-                        comentario.comment,
-                        key: ValueKey(
-                            "${CommentsListKeyPrefix.commentText} $index"),
-                        style: TextStyle(fontSize: 13, color: Colors.red),
-                        textAlign: TextAlign.left,
-                      )
-                    : Container(),
+                Text(
+                  comentario.comment,
+                  key: ValueKey("${CommentsListKeyPrefix.commentText} $index"),
+                  style: TextStyle(
+                      fontSize: 13,
+                      color: mine == 'Concordo' ? Colors.blue : Colors.red),
+                  textAlign:
+                      mine == 'Concordo' ? TextAlign.start : TextAlign.end,
+                ),
                 Divider(),
               ],
             ),
           ),
+          mine != 'Concordo'
+              ? Padding(
+                  padding: const EdgeInsets.only(left: 16),
+                  child: Container(
+                    width: 50.0,
+                    height: 50.0,
+                    decoration: new BoxDecoration(
+                      color: const Color(0xff7c94b6),
+                      image: new DecorationImage(
+                        image: new NetworkImage(comentario.foto),
+                        fit: BoxFit.cover,
+                      ),
+                      borderRadius:
+                          new BorderRadius.all(new Radius.circular(50.0)),
+                    ),
+                  ),
+                )
+              : Container(),
         ],
       ),
     );

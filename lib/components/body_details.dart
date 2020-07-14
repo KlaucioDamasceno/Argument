@@ -110,7 +110,7 @@ class _BodyDetailsState extends State<BodyDetails> {
               color: Colors.white,
               borderRadius: BorderRadius.circular(30),
             ),
-            child: _listarAtividadesStream(),
+            child: _listarComentariosStream(),
           ),
         ],
       ),
@@ -119,12 +119,12 @@ class _BodyDetailsState extends State<BodyDetails> {
 
   void _sendComment(String text, String posicao) {
     Comentario comentario = Comentario(
-      comment: text,
-      username: this._usuarioService.usuarioStore.usuario.nome,
-      debate: widget.atividade.uid,
-      posicao: posicao,
-      time: DateTime.now(),
-    );
+        comment: text,
+        username: this._usuarioService.usuarioStore.usuario.nome,
+        debate: widget.atividade.uid,
+        posicao: posicao,
+        time: DateTime.now(),
+        foto: this._usuarioService.usuarioStore.usuario.foto);
     DocumentReference comentarioRef =
         Firestore.instance.collection('comentarios').document();
     Comentario novoComentario =
@@ -137,7 +137,7 @@ class _BodyDetailsState extends State<BodyDetails> {
     return _comentario = Comentario.fromMap(documents[index].data);
   }
 
-  _listarAtividadesStream() {
+  _listarComentariosStream() {
     return StreamBuilder(
       stream: Firestore.instance
           .collection('comentarios')

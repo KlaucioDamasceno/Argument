@@ -7,8 +7,7 @@ class Comentario {
   final String username;
   final String posicao;
   final DateTime time;
-
-  //final String foto;
+  final String foto;
 
   Comentario(
       {this.uid,
@@ -16,7 +15,8 @@ class Comentario {
       this.debate,
       this.username,
       this.posicao,
-      this.time});
+      this.time,
+      this.foto});
 
   Map<String, dynamic> toMap() {
     return {
@@ -25,34 +25,32 @@ class Comentario {
       'debate': debate,
       'username': username,
       'posicao': posicao,
-      //'foto': foto,
+      'foto': foto,
       'time': time?.millisecondsSinceEpoch,
     };
   }
 
   static Comentario fromMap(Map<String, dynamic> map) {
     return Comentario(
-      uid: map["uid"],
-      comment: map["comment"],
-      debate: map["debate"],
-      username: map["username"],
-      posicao: map["posicao"],
-      time: map["time"] != null
-          ? DateTime.fromMillisecondsSinceEpoch(map["time"])
-          : null,
-    );
-
-    //foto: map["foto"]);
+        uid: map["uid"],
+        comment: map["comment"],
+        debate: map["debate"],
+        username: map["username"],
+        posicao: map["posicao"],
+        time: map["time"] != null
+            ? DateTime.fromMillisecondsSinceEpoch(map["time"])
+            : null,
+        foto: map["foto"]);
   }
 
   Comentario copyWith({String uid}) {
     return Comentario(
-      uid: uid,
-      comment: this.comment,
-      debate: this.debate,
-      username: this.username,
-      posicao: this.posicao,
-      time: this.time,
-    );
+        uid: uid,
+        comment: this.comment,
+        debate: this.debate,
+        username: this.username,
+        posicao: this.posicao,
+        time: this.time,
+        foto: this.foto);
   }
 }
